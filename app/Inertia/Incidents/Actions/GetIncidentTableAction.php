@@ -14,7 +14,7 @@ class GetIncidentTableAction
         array               $queryParams = [],
     ): LengthAwarePaginator
     {
-        return QueryBuilder::for(
+        $query = QueryBuilder::for(
             Incident::query()
                 ->with([
                         'objectInfrastructure:id,name,type',
@@ -32,7 +32,15 @@ class GetIncidentTableAction
                     ]
                 ))
             ->allowedSorts(['datetime_incident'])
-            ->defaultSort('-datetime_incident')
+            ->defaultSort('-datetime_incident');
+
+        $numberIncidentFilter = $filters->filterByNumber();
+
+        if ($numberIncidentFilter !== null) {
+            $query->where('id', $numberIncidentFilter);
+        }
+
+        return $query
             ->paginate($filters->normalizedPerPage())
             ->appends($queryParams);
 

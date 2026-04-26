@@ -1,0 +1,26 @@
+/* resources/css/inertia/ant-tabler-fix.css */
+
+/* === Ant Design + Tabler safe FIX === */
+
+/* кнопки только с иконкой */
+.ant-btn.ant-btn-icon-only,
+.ant-input-search-button {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* иконки внутри кнопок */
+.ant-btn .anticon,
+.ant-input-search-button .anticon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* clear icon / крестик */
+.ant-input-clear-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}

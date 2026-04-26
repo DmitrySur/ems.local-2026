@@ -30,9 +30,11 @@ readonly class IncidentIndexViewModel
             'filters' => [
                 'per_page' => $this->filters->normalizedPerPage(),
                 'page' => $this->filters->page,
+                'sort' => $this->filters->sort,
+                'filter' => $this->filters->filter,
             ],
             'options' => [
-                'per_page' => [10, 25, 50, 100],
+                'per_page' => [10, 15, 25, 50, 100],
             ]
         ];
     }

@@ -8,7 +8,16 @@ defineProps({
     },
 })
 
-defineEmits(['change'])
+
+const emit = defineEmits(['page-change', 'page-size-change'])
+
+function onPageChange(page, pageSize) {
+    emit('page-change', page)
+}
+
+function onShowSizeChange(current, size) {
+    emit('page-size-change', size)
+}
 </script>
 
 <template>
@@ -18,8 +27,10 @@ defineEmits(['change'])
             :page-size="meta.per_page"
             :total="meta.total"
             :show-size-changer="true"
+            :page-size-options="['10', '15', '25', '50', '100']"
             :locale="{ items_per_page: '/ стр.' }"
-            @change="$emit('change', $event)"
+            @change="onPageChange"
+            @showSizeChange="onShowSizeChange"
         >
             <template #itemRender="{ type, originalElement }">
                 <!-- Кнопка "Вперед на 5 страниц" -->
@@ -34,6 +45,5 @@ defineEmits(['change'])
         </a-pagination>
     </div>
 </template>
-
 
 

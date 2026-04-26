@@ -1,11 +1,12 @@
 import '@tabler/core/dist/css/tabler.min.css'
 import 'ant-design-vue/dist/reset.css'
+import '../../css/inertia/ant-tabler-fix.css'
 import '@tabler/core/dist/js/tabler.min.js'
 
 import {createApp, h} from 'vue'
-import { createInertiaApp, Head, Link } from '@inertiajs/vue3'
+import {createInertiaApp, Head, Link} from '@inertiajs/vue3'
 import Antd from 'ant-design-vue'
-import { ZiggyVue } from 'ziggy-js'
+import {ZiggyVue} from 'ziggy-js'
 
 import TablerLayout from "@/Layouts/TablerLayout.vue";
 

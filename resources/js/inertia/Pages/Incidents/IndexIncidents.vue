@@ -17,7 +17,13 @@
 
     <div class="card">
         <div class="card-body">
-            Контент страницы
+            <div class="d-flex flex-wrap justify-content-between">
+                <div>Левый контент</div>
+                <SearchInToolbar
+                    :state="state"
+                    @reload="reload"
+                />
+            </div>
         </div>
     </div>
     <div class="card mt-3 mb-3">
@@ -30,7 +36,8 @@
             <div class="card-footer d-flex align-items-center justify-content-center">
                 <IncidentTablePagination
                     :meta="table.meta"
-                    @change="reload"
+                    @page-change="reload"
+                    @page-size-change="onPerPageChange"
                 />
             </div>
 
@@ -44,6 +51,7 @@ import {route} from 'ziggy-js';
 import {reactive, watch} from "vue";
 import IncidentTable from "@/Pages/Incidents/IncidentsTable/IncidentTable.vue";
 import IncidentTablePagination from "@/Pages/Incidents/IncidentsTable/IncidentTablePagination.vue";
+import SearchInToolbar from "@/Pages/Incidents/IncidentsTable/IncidentSearchInToolbar.vue";
 
 const props = defineProps({
     table: {type: Object, required: true},
@@ -57,6 +65,7 @@ const state = reactive({
     sort: props.filters.sort ?? 'datetime_incident',
     per_page: props.filters.per_page ?? 15,
     page: props.filters.page ?? 1,
+    search_by_number: props.filters.filter?.search_by_number ?? '',
 })
 
 /**
@@ -76,6 +85,7 @@ watch(
         state.sort = filters.sort ?? ''
         state.per_page = filters.per_page ?? 15
         state.page = filters.page ?? 1
+        state.search_by_number = filters.filter?.search_by_number ?? ''
     },
     {deep: true, immediate: true}
 )
@@ -87,18 +97,18 @@ function buildQuery(page = 1) {
     const query = {
         page,
         per_page: state.per_page,
-        sort: state.sort,
     }
-    const filter = {}
-    // быстрый поиск
-    //if (state.search) filter.search = state.search
-    // сегмент
-    //if (state.type) filter.type = state.type
-    // модалка
-    //if (state.place) filter.place = state.place
-    if (Object.keys(filter).length) {
-        query.filter = filter
+
+    if (state.sort) {
+        query.sort = state.sort
     }
+
+    if (state.search_by_number) {
+        query.filter = {
+            search_by_number: state.search_by_number,
+        }
+    }
+
     return query
 }
 
@@ -140,9 +150,10 @@ function onPerPageChange(value) {
  * Сброс всех фильтров
  */
 function resetFilters() {
-    state.sort = '-occurred_at'
+    state.sort = ''
     state.per_page = 15
     state.page = 1
+    state.search_by_number = ''
     reload(1)
 }
 </script>
