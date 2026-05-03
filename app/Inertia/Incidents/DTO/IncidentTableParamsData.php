@@ -5,13 +5,13 @@ namespace App\Inertia\Incidents\DTO;
 use App\Inertia\Incidents\Requests\IncidentIndexRequest;
 use Spatie\LaravelData\Data;
 
-class IncidentFiltersData extends Data
+class IncidentTableParamsData extends Data
 {
     public function __construct(
-        public int     $per_page = 15,
-        public int     $page = 1,
+        public int $per_page = 15,
+        public int $page = 1,
         public ?string $sort = null,
-        public array   $filter = [],
+        public array $filter = [],
     )
     {
     }
@@ -22,7 +22,7 @@ class IncidentFiltersData extends Data
 
         return new self(
             per_page: (int)($validated['per_page'] ?? 15),
-            page: (int) ($validated['page'] ?? 1),
+            page: (int)($validated['page'] ?? 1),
             sort: $validated['sort'] ?? null,
             filter: $validated['filter'] ?? [],
         );
@@ -34,16 +34,4 @@ class IncidentFiltersData extends Data
             ? $this->per_page
             : 15;
     }
-
-    public function filterByNumber(): ?int
-    {
-        $value = $this->filter['search_by_number'] ?? null;
-
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        return ctype_digit((string)$value) ? (int)$value : null;
-    }
-
 }

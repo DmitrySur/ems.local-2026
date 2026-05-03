@@ -2,16 +2,17 @@
 
 namespace App\Inertia\Incidents\Actions;
 
-use App\Inertia\Incidents\DTO\IncidentFiltersData;
+use App\Inertia\Incidents\DTO\IncidentTableParamsData;
 use App\Models\Incident\Incident;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
 class GetIncidentTableAction
 {
     public function handle(
-        IncidentFiltersData $filters,
-        array               $queryParams = [],
+        IncidentTableParamsData $filters,
+        array                   $queryParams = [],
     ): LengthAwarePaginator
     {
         $query = QueryBuilder::for(
@@ -31,15 +32,13 @@ class GetIncidentTableAction
                         'editor:id,name',
                     ]
                 ))
+            ->allowedFilters([
+                AllowedFilter::exact('search_by_number', 'id'),
+                AllowedFilter::exact('division_id'),
+                AllowedFilter::exact('incident_type_id')
+            ])
             ->allowedSorts(['datetime_incident'])
             ->defaultSort('-datetime_incident');
-
-        $numberIncidentFilter = $filters->filterByNumber();
-
-        if ($numberIncidentFilter !== null) {
-            $query->where('id', $numberIncidentFilter);
-        }
-
         return $query
             ->paginate($filters->normalizedPerPage())
             ->appends($queryParams);

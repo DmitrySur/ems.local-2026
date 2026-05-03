@@ -1,5 +1,6 @@
 <?php
 
+use App\Inertia\ApiSupportControllers\ApiSupportObjectInfrastructureSelectController;
 use App\Inertia\Incidents\Controllers\IncidentsInertiaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,7 +22,12 @@ Route::middleware(['web'])
     ->group(function () {
         Route::get('/incidents', [IncidentsInertiaController::class, 'index'])
             ->name('incidents.index');
+        Route::get(
+            '/api/object-infrastructures/select',
+            ApiSupportObjectInfrastructureSelectController::class
+        )->name('api.object-infrastructures.select');
     });
 Route::get('/inertia-test', function () {
     return Inertia::render('Incidents/IndexIncidents');
 });
+

@@ -2,15 +2,27 @@
 
 /* === Ant Design + Tabler safe FIX === */
 
-/* кнопки только с иконкой */
-.ant-btn.ant-btn-icon-only,
-.ant-input-search-button {
+/* Ant Search: wrapper */
+.ant-input-search .ant-input-wrapper {
+    display: flex;
+    align-items: stretch;
+}
+
+/* Ant Search: кнопка поиска */
+.ant-input-search .ant-input-search-button {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
 }
 
-/* иконки внутри кнопок */
+/* Ant Button: кнопки только с иконкой */
+.ant-btn.ant-btn-icon-only {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Иконки только внутри Ant-кнопок */
 .ant-btn .anticon,
 .ant-input-search-button .anticon {
     display: inline-flex;
@@ -18,8 +30,24 @@
     justify-content: center;
 }
 
-/* clear icon / крестик */
+/* Clear icon в input */
 .ant-input-clear-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Close icon в tag */
+.ant-tag .ant-tag-close-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-inline-start: 4px;
+    line-height: 1;
+}
+
+/* SVG внутри close icon */
+.ant-tag .ant-tag-close-icon .anticon {
     display: inline-flex;
     align-items: center;
     justify-content: center;

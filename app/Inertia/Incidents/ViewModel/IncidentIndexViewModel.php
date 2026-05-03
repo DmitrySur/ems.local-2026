@@ -2,15 +2,17 @@
 
 namespace App\Inertia\Incidents\ViewModel;
 
-use App\Inertia\Incidents\DTO\IncidentFiltersData;
+use App\Inertia\Incidents\DTO\IncidentTableParamsData;
 use App\Inertia\Incidents\JsonResources\IncidentTableResource;
+use App\Inertia\Support\Options\DivisionOptions;
+use App\Inertia\Support\Options\IncidentTypesOptions;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 readonly class IncidentIndexViewModel
 {
     public function __construct(
-        private LengthAwarePaginator $paginator,
-        private IncidentFiltersData  $filters,
+        private LengthAwarePaginator    $paginator,
+        private IncidentTableParamsData $filters,
     )
     {
     }
@@ -35,6 +37,8 @@ readonly class IncidentIndexViewModel
             ],
             'options' => [
                 'per_page' => [10, 15, 25, 50, 100],
+                'divisions' => app(DivisionOptions::class)->get(),
+                'incident_types' => app(IncidentTypesOptions::class)->get(),
             ]
         ];
     }

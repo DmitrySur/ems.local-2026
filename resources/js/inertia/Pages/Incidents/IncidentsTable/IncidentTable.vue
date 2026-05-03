@@ -1,7 +1,9 @@
 <!--suppress VueUnrecognizedSlot -->
 <script setup>
-import {computed} from 'vue'
+import {computed, toRef} from 'vue'
 import {CalendarOutlined, ClockCircleOutlined, WarningFilled} from '@ant-design/icons-vue';
+import {useObjectInfrastructureSelect} from '@/Support/ObjectInfrastructureSelect/useObjectInfrastructureSelect.js'
+
 
 const props = defineProps({
     rows: {
@@ -12,9 +14,40 @@ const props = defineProps({
         type: [String, null],
         required: true,
     },
+    divisionOptions: {
+        type: Array,
+        required: true,
+    },
+    selectedDivision: {
+        type: [Number, String, null],
+        default: null,
+    },
+    incidentTypesOptions: {
+        type: Array,
+        required: true,
+    },
+    selectedIncidentType: {
+        type: [Number, String, null],
+        default: null,
+    },
+    selectedObjectInfrastructure: {
+        type: [Number, String, null],
+        default: null,
+    },
 })
 
-const emit = defineEmits(['sort-change'])
+const emit = defineEmits(['sort-change', 'filter-change'])
+
+const selectedObjectInfrastructureRef = toRef(props, 'selectedObjectInfrastructure')
+
+const {
+    options: objectInfrastructureOptions,
+    loading: objectInfrastructureLoading,
+    onSearch: onObjectInfrastructureSearch,
+    getIconComponent: getObjectInfrastructureIconComponent,
+    iconStyle: objectInfrastructureIconStyle,
+    getPrefix: getObjectInfrastructurePrefix,
+} = useObjectInfrastructureSelect(selectedObjectInfrastructureRef)
 
 // Возвращаем sortOrder для конкретной колонки.
 // Это нужно для controlled-режима сортировки Ant Design.
@@ -75,15 +108,23 @@ const columns = computed(() => [
         title: 'ЭМЧ',
         dataIndex: 'division_short_name',
         key: 'division_short_name',
-        width: 120
+        width: 120,
+        customFilterDropdown: true,
+        filteredValue: props.selectedDivision ? [props.selectedDivision] : null,
     },
     {
         title: 'Место',
         key: 'object_infrastructure_template',
+        customFilterDropdown: true,
+        filteredValue: props.selectedObjectInfrastructure
+            ? [props.selectedObjectInfrastructure]
+            : null,
     },
     {
         title: 'Тип инцидента',
         key: 'incident_type_template',
+        customFilterDropdown: true,
+        filteredValue: props.selectedIncidentType ? [props.selectedIncidentType] : null,
     },
     {
         title: 'Описание',
@@ -227,5 +268,153 @@ const columns = computed(() => [
                 </div>
             </template>
         </template>
+        <!-- ФИЛЬТРЫ В КОЛОНКАХ -->
+
+        <template #customFilterDropdown="{ column, confirm }">
+            <!-- ФИЛЬТР В КОЛОНКЕ "ЭМЧ" -->
+            <div
+                v-if="column.key === 'division_short_name'"
+                style="padding: 8px; width: 240px"
+            >
+                <div class="text-secondary small lh-base mb-1">
+                    Фильтр по ЭМЧ:
+                </div>
+                <a-select
+                    :value="selectedDivision"
+                    allow-clear
+                    show-search
+                    placeholder="Выберите ЭМЧ"
+                    style="width: 100%"
+                    :options="divisionOptions"
+                    option-filter-prop="label"
+                    @change="value => {
+                emit('filter-change', 'division_id', value)
+                confirm()
+            }"
+                />
+            </div>
+            <!-- ФИЛЬТР В КОЛОНКЕ "ТИП ИНЦИДЕНТА" -->
+            <div
+                v-if="column.key === 'incident_type_template'"
+                style="padding: 8px; width: 240px"
+            >
+                <div class="text-secondary small lh-base mb-1">
+                    Фильтр по типу инцидента:
+                </div>
+                <a-select
+                    :value="selectedIncidentType"
+                    allow-clear
+                    show-search
+                    placeholder="Выберите тип"
+                    style="width: 100%"
+                    :options="incidentTypesOptions"
+                    option-filter-prop="label"
+                    @change="value => {
+                emit('filter-change', 'incident_type_id', value)
+                confirm()
+            }"
+                />
+            </div>
+            <!-- ФИЛЬТР В КОЛОНКЕ "МЕСТО" -->
+            <div
+                v-if="column.key === 'object_infrastructure_template'"
+                style="padding: 8px; width: 360px"
+            >
+                <div class="text-secondary small lh-base mb-1">
+                    Фильтр по объекту:
+                </div>
+
+                <a-select
+                    :value="selectedObjectInfrastructure"
+                    allow-clear
+                    show-search
+                    :filter-option="false"
+                    :loading="objectInfrastructureLoading"
+                    :options="objectInfrastructureOptions"
+                    placeholder="Начните вводить наименование"
+                    style="width: 100%"
+                    @search="onObjectInfrastructureSearch"
+                    @change="value => {
+            emit('filter-change', 'object_infrastructure_id', value)
+            confirm()
+        }"
+                >
+                    <template #option="{ label, type, short_name }">
+    <span class="oi-select__row">
+        <span class="oi-select__head">
+            <component
+                :is="getObjectInfrastructureIconComponent(type)"
+                :size="18"
+                :stroke-width="2"
+                :style="objectInfrastructureIconStyle(type, short_name)"
+                class="oi-select__icon"
+            />
+
+            <span class="oi-select__prefix text-secondary">
+                {{ getObjectInfrastructurePrefix(type) }}
+            </span>
+
+            <span class="oi-select__label">
+                {{ label }}
+            </span>
+        </span>
+    </span>
+                    </template>
+                    <template #labelRender="{ label, option }">
+    <span class="oi-select__row">
+        <span class="oi-select__head">
+            <component
+                :is="getObjectInfrastructureIconComponent(option?.type)"
+                :size="18"
+                :stroke-width="2"
+                :style="objectInfrastructureIconStyle(option?.type, option?.short_name)"
+                class="oi-select__icon"
+            />
+
+            <span class="oi-select__prefix text-secondary">
+                {{ getObjectInfrastructurePrefix(option?.type) }}
+            </span>
+
+            <span class="oi-select__label">
+                {{ label }}
+            </span>
+        </span>
+    </span>
+                    </template>
+                </a-select>
+            </div>
+        </template>
     </a-table>
 </template>
+<style scoped>
+.oi-select__row {
+    display: block;
+    width: 100%;
+    white-space: normal;
+    line-height: 1.25;
+}
+
+.oi-select__head {
+    display: inline;
+    white-space: normal;
+}
+
+.oi-select__icon {
+    display: inline-block;
+    vertical-align: -4px;
+    margin-right: 6px;
+    flex: 0 0 auto;
+}
+
+.oi-select__prefix {
+    display: inline;
+    margin-right: 6px;
+    white-space: nowrap;
+}
+
+.oi-select__label {
+    display: inline;
+    white-space: normal;
+    word-break: break-word;
+}
+</style>

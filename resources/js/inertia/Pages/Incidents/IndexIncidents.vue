@@ -18,9 +18,12 @@
     <div class="card">
         <div class="card-body">
             <div class="d-flex flex-wrap justify-content-between">
-                <div>Левый контент</div>
                 <SearchInToolbar
                     :state="state"
+                    :select-options="{
+                    division_id: options.divisions,
+                    incident_type_id: options.incident_types
+                    }"
                     @reload="reload"
                 />
             </div>
@@ -32,6 +35,12 @@
                 :rows="table.data"
                 :current-sort="state.sort"
                 @sort-change="onSortChange"
+                :division-options="options.divisions"
+                :selected-division="state.division_id"
+                :incident-types-options="options.incident_types"
+                :selected-incident-type="state.incident_type_id"
+                :selected-object-infrastructure="state.object_infrastructure_id"
+                @filter-change="onFilterChange"
             />
             <div class="card-footer d-flex align-items-center justify-content-center">
                 <IncidentTablePagination
@@ -65,7 +74,10 @@ const state = reactive({
     sort: props.filters.sort ?? 'datetime_incident',
     per_page: props.filters.per_page ?? 15,
     page: props.filters.page ?? 1,
-    search_by_number: props.filters.filter?.search_by_number ?? '',
+    search_by_number: props.filters.filter?.search_by_number ?? null,
+    division_id: props.filters.filter?.division_id ?? null,
+    incident_type_id: props.filters.filter?.incident_type_id ?? null,
+    object_infrastructure_id: props.filters.filter?.object_infrastructure_id ?? null,
 })
 
 /**
@@ -85,15 +97,24 @@ watch(
         state.sort = filters.sort ?? ''
         state.per_page = filters.per_page ?? 15
         state.page = filters.page ?? 1
-        state.search_by_number = filters.filter?.search_by_number ?? ''
+        state.search_by_number = filters.filter?.search_by_number ?? null
+        state.division_id = filters.filter?.division_id ?? null
+        state.incident_type_id = filters.filter?.incident_type_id ?? null
+        state.object_infrastructure_id = filters.filter?.object_infrastructure_id ?? null
     },
     {deep: true, immediate: true}
 )
 
+function onFilterChange(key, value) {
+    state[key] = value ?? null
+    state.page = 1
+    reload(1)
+}
+
 /**
  * Собираем query для backend (Spatie Query Builder)
  */
-function buildQuery(page = 1) {
+function buildQuery(page = state.page) {
     const query = {
         page,
         per_page: state.per_page,
@@ -103,10 +124,26 @@ function buildQuery(page = 1) {
         query.sort = state.sort
     }
 
+    const filters = {}
+
     if (state.search_by_number) {
-        query.filter = {
-            search_by_number: state.search_by_number,
-        }
+        filters.search_by_number = state.search_by_number
+    }
+
+    if (state.division_id) {
+        filters.division_id = state.division_id
+    }
+
+    if (state.incident_type_id) {
+        filters.incident_type_id = state.incident_type_id
+    }
+
+    if (state.object_infrastructure_id) {
+        filters.object_infrastructure_id = state.object_infrastructure_id
+    }
+
+    if (Object.keys(filters).length) {
+        query.filter = filters
     }
 
     return query
@@ -153,7 +190,10 @@ function resetFilters() {
     state.sort = ''
     state.per_page = 15
     state.page = 1
-    state.search_by_number = ''
+    state.search_by_number = null
+    state.division_id = null
+    state.incident_type_id = null
+    state.object_infrastructure_id = null
     reload(1)
 }
 </script>

@@ -23,9 +23,7 @@ export default defineConfig({
         port: 5173,
         strictPort: true,
         https: true,
-        cors: {
-            origin: ['https://ems.local'],
-        },
+        cors: true,
         hmr: {
             host: 'ems.local',
             protocol: 'wss',
