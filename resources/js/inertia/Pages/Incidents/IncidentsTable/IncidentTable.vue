@@ -1,8 +1,15 @@
 <!--suppress VueUnrecognizedSlot -->
 <script setup>
 import {computed, toRef} from 'vue'
-import {CalendarOutlined, ClockCircleOutlined, WarningFilled} from '@ant-design/icons-vue';
+import {
+    CalendarOutlined,
+    ClockCircleOutlined,
+    WarningFilled,
+    SearchOutlined,
+    DownOutlined
+} from '@ant-design/icons-vue';
 import {useObjectInfrastructureSelect} from '@/Support/ObjectInfrastructureSelect/useObjectInfrastructureSelect.js'
+import ObjectInfrastructureSelectLabel from '../../../Support/VueComponents/ObjectInfrastructureSelectLabel.vue'
 
 
 const props = defineProps({
@@ -44,9 +51,7 @@ const {
     options: objectInfrastructureOptions,
     loading: objectInfrastructureLoading,
     onSearch: onObjectInfrastructureSearch,
-    getIconComponent: getObjectInfrastructureIconComponent,
-    iconStyle: objectInfrastructureIconStyle,
-    getPrefix: getObjectInfrastructurePrefix,
+    selectedOption: selectedObjectInfrastructureOption,
 } = useObjectInfrastructureSelect(selectedObjectInfrastructureRef)
 
 // Возвращаем sortOrder для конкретной колонки.
@@ -323,98 +328,106 @@ const columns = computed(() => [
                 <div class="text-secondary small lh-base mb-1">
                     Фильтр по объекту:
                 </div>
-
                 <a-select
+                    class="oi-object-filter-select"
+                    popup-class-name="oi-object-filter-select-popup"
                     :value="selectedObjectInfrastructure"
                     allow-clear
                     show-search
                     :filter-option="false"
                     :loading="objectInfrastructureLoading"
-                    :options="objectInfrastructureOptions"
                     placeholder="Начните вводить наименование"
                     style="width: 100%"
                     @search="onObjectInfrastructureSearch"
                     @change="value => {
-            emit('filter-change', 'object_infrastructure_id', value)
-            confirm()
-        }"
+        emit('filter-change', 'object_infrastructure_id', value)
+        confirm()
+    }"
                 >
-                    <template #option="{ label, type, short_name }">
-    <span class="oi-select__row">
-        <span class="oi-select__head">
-            <component
-                :is="getObjectInfrastructureIconComponent(type)"
-                :size="18"
-                :stroke-width="2"
-                :style="objectInfrastructureIconStyle(type, short_name)"
-                class="oi-select__icon"
-            />
-
-            <span class="oi-select__prefix text-secondary">
-                {{ getObjectInfrastructurePrefix(type) }}
-            </span>
-
-            <span class="oi-select__label">
-                {{ label }}
-            </span>
-        </span>
-    </span>
-                    </template>
-                    <template #labelRender="{ label, option }">
-    <span class="oi-select__row">
-        <span class="oi-select__head">
-            <component
-                :is="getObjectInfrastructureIconComponent(option?.type)"
-                :size="18"
-                :stroke-width="2"
-                :style="objectInfrastructureIconStyle(option?.type, option?.short_name)"
-                class="oi-select__icon"
-            />
-
-            <span class="oi-select__prefix text-secondary">
-                {{ getObjectInfrastructurePrefix(option?.type) }}
-            </span>
-
-            <span class="oi-select__label">
-                {{ label }}
-            </span>
-        </span>
-    </span>
-                    </template>
+                    <a-select-option
+                        v-for="option in objectInfrastructureOptions"
+                        :key="option.value"
+                        :value="option.value"
+                    >
+                        <ObjectInfrastructureSelectLabel
+                            :label="option.label"
+                            :type="option.type"
+                            :short-name="option.short_name"
+                        />
+                    </a-select-option>
                 </a-select>
             </div>
         </template>
     </a-table>
 </template>
 <style scoped>
-.oi-select__row {
-    display: block;
-    width: 100%;
-    white-space: normal;
-    line-height: 1.25;
+/* Сам select */
+.oi-object-filter-select :deep(.ant-select-selector) {
+    height: auto !important;
+    min-height: 40px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    align-items: center !important;
 }
 
-.oi-select__head {
-    display: inline;
-    white-space: normal;
+/* Поле поиска внутри select */
+.oi-object-filter-select :deep(.ant-select-selection-search) {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
 }
 
-.oi-select__icon {
-    display: inline-block;
-    vertical-align: -4px;
-    margin-right: 6px;
-    flex: 0 0 auto;
+/* Input поиска */
+.oi-object-filter-select :deep(.ant-select-selection-search-input) {
+    height: 100% !important;
+    line-height: 1.25 !important;
 }
 
-.oi-select__prefix {
-    display: inline;
-    margin-right: 6px;
-    white-space: nowrap;
+/* Placeholder */
+.oi-object-filter-select :deep(.ant-select-selection-placeholder) {
+    display: flex !important;
+    align-items: center !important;
+    height: 100% !important;
+    line-height: 1.25 !important;
 }
 
-.oi-select__label {
-    display: inline;
-    white-space: normal;
-    word-break: break-word;
+/* Выбранное значение */
+.oi-object-filter-select :deep(.ant-select-selection-item) {
+    display: block !important;
+    white-space: normal !important;
+    line-height: 1.25 !important;
+    padding-top: 1px !important;
+    padding-bottom: 1px !important;
+    padding-right: 28px !important;
+}
+
+/* Штатная стрелка / лупа Ant Design */
+.oi-object-filter-select :deep(.ant-select-arrow) {
+    top: 50% !important;
+    right: 11px !important;
+    margin-top: 0 !important;
+    transform: translateY(-50%) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+}
+
+/* Штатный крестик очистки */
+.oi-object-filter-select :deep(.ant-select-clear) {
+    top: 50% !important;
+    right: 11px !important;
+    margin-top: 0 !important;
+    transform: translateY(-50%) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+}
+
+/* Выпадающий список только этого select */
+:global(.oi-object-filter-select-popup .ant-select-item-option-content) {
+    white-space: normal !important;
+    line-height: 1.25 !important;
 }
 </style>

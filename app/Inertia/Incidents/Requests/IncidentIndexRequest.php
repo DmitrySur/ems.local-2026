@@ -13,6 +13,7 @@ class IncidentIndexRequest extends FormRequest
         'search_by_number',
         'division_id',
         'incident_type_id',
+        'object_infrastructure_id'
     ];
 
 
@@ -51,6 +52,7 @@ class IncidentIndexRequest extends FormRequest
             'filter.search_by_number' => ['nullable', 'integer', 'min:1'],
             'filter.division_id' => ['nullable', 'integer', 'min:1'],
             'filter.incident_type_id' => ['nullable', 'integer', 'min:1'],
+            'filter.object_infrastructure_id' => ['nullable', 'integer', 'min:1'],
         ];
     }
 

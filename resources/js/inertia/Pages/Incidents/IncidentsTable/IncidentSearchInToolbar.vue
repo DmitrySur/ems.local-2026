@@ -1,5 +1,7 @@
 <script setup>
-import {computed} from 'vue'
+import {computed, toRef} from 'vue'
+import {useObjectInfrastructureSelect} from '@/Support/ObjectInfrastructureSelect/useObjectInfrastructureSelect.js'
+import ObjectInfrastructureSelectLabel from '../../../Support/VueComponents/ObjectInfrastructureSelectLabel.vue'
 
 const props = defineProps({
     state: {
@@ -18,11 +20,14 @@ const filterLabels = {
     search_by_number: 'Номер инцидента',
     division_id: 'Подразделение',
     incident_type_id: 'Тип',
+    object_infrastructure_id: 'Объект',
 }
 //Значение для сброса по умолчанию
 const filterDefaults = {
     search_by_number: null,
     division_id: null,
+    incident_type_id: null,
+    object_infrastructure_id: null
 }
 
 function isEmpty(value) {
@@ -32,6 +37,11 @@ function isEmpty(value) {
         || (Array.isArray(value) && value.length === 0)
 }
 
+const selectedObjectInfrastructureRef = toRef(props.state, 'object_infrastructure_id')
+const {
+    selectedOption: selectedObjectInfrastructureOption,
+} = useObjectInfrastructureSelect(selectedObjectInfrastructureRef)
+
 const activeFilters = computed(() => {
     return Object.entries(filterLabels)
         .filter(([key]) => !isEmpty(props.state[key]))
@@ -39,6 +49,9 @@ const activeFilters = computed(() => {
             key,
             label,
             value: getFilterValueLabel(key, props.state[key]),
+            objectInfrastructureOption: key === 'object_infrastructure_id'
+                ? selectedObjectInfrastructureOption.value
+                : null,
         }))
 })
 
@@ -78,7 +91,27 @@ function removeFilter(key) {
                 @close.prevent="removeFilter(filter.key)"
             >
                 <span class="text-secondary">{{ filter.label }}:</span>
-                {{ filter.value }}
+
+                <span
+                    v-if="filter.key === 'object_infrastructure_id'"
+                    class="active-object-infrastructure-filter"
+                >
+<template v-if="filter.objectInfrastructureOption">
+    <ObjectInfrastructureSelectLabel
+        :label="filter.objectInfrastructureOption.label"
+        :type="filter.objectInfrastructureOption.type"
+        :short-name="filter.objectInfrastructureOption.short_name"
+    />
+</template>
+
+<template v-else>
+    <span class="text-secondary">загрузка...</span>
+</template>
+</span>
+
+                <template v-else>
+                    {{ filter.value }}
+                </template>
             </a-tag>
         </div>
 
@@ -122,5 +155,36 @@ function removeFilter(key) {
     width: 48px !important;
     height: 32px !important;
     border-radius: 0 8px 8px 0 !important;
+}
+.active-object-infrastructure-filter {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.active-object-infrastructure-filter :deep(.oi-object-label) {
+    display: inline-flex;
+    align-items: center;
+    width: auto;
+    line-height: 1;
+}
+
+.active-object-infrastructure-filter :deep(.oi-object-label__icon) {
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.active-object-infrastructure-filter :deep(.oi-object-label__prefix) {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 4px;
+    line-height: 1;
+}
+
+.active-object-infrastructure-filter :deep(.oi-object-label__text) {
+    display: inline;
+    line-height: 1;
+    white-space: nowrap;
 }
 </style>

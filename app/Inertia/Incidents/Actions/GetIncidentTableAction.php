@@ -35,7 +35,9 @@ class GetIncidentTableAction
             ->allowedFilters([
                 AllowedFilter::exact('search_by_number', 'id'),
                 AllowedFilter::exact('division_id'),
-                AllowedFilter::exact('incident_type_id')
+                AllowedFilter::exact('incident_type_id'),
+                AllowedFilter::exact('object_infrastructure_id'),
+
             ])
             ->allowedSorts(['datetime_incident'])
             ->defaultSort('-datetime_incident');
