@@ -2,6 +2,7 @@
 
 namespace App\Inertia\Incidents\Actions;
 
+use App\Inertia\Incidents\CustomFilters\IncidentPresetFilter;
 use App\Inertia\Incidents\DTO\IncidentTableParamsData;
 use App\Models\Incident\Incident;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -37,6 +38,8 @@ class GetIncidentTableAction
                 AllowedFilter::exact('division_id'),
                 AllowedFilter::exact('incident_type_id'),
                 AllowedFilter::exact('object_infrastructure_id'),
+                AllowedFilter::custom('preset_filter', new IncidentPresetFilter())
+                    ->default(IncidentPresetFilter::DEFAULT),
 
             ])
             ->allowedSorts(['datetime_incident'])

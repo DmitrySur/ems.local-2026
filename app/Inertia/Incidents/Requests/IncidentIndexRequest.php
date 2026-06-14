@@ -21,7 +21,7 @@ class IncidentIndexRequest extends FormRequest
      * Простые строковые фильтры (scalar)
      */
     private const STRING_FILTERS = [
-        // 'status_incident',
+        'preset_filter'
     ];
 
     /**
@@ -53,6 +53,11 @@ class IncidentIndexRequest extends FormRequest
             'filter.division_id' => ['nullable', 'integer', 'min:1'],
             'filter.incident_type_id' => ['nullable', 'integer', 'min:1'],
             'filter.object_infrastructure_id' => ['nullable', 'integer', 'min:1'],
+            'filter.preset_filter' => [
+                'nullable',
+                'string',
+                'in:all,unresolved_all,unresolved_day,nnr_all,nnr_unresolved,day_all',
+            ],
         ];
     }
 
