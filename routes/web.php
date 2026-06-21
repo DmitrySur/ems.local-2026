@@ -1,6 +1,7 @@
 <?php
 
 use App\Inertia\ApiSupportControllers\ApiSupportObjectInfrastructureSelectController;
+use App\Inertia\Incidents\Controllers\IncidentCreateFormController;
 use App\Inertia\Incidents\Controllers\IncidentsInertiaController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,6 +27,10 @@ Route::middleware(['web'])
             '/api/object-infrastructures/select',
             ApiSupportObjectInfrastructureSelectController::class
         )->name('api.object-infrastructures.select');
+        Route::get('/api/incidents/create-form',
+            IncidentCreateFormController::class)
+            ->name('api.incidents.create-form');
+
     });
 Route::get('/inertia-test', function () {
     return Inertia::render('Incidents/IndexIncidents');

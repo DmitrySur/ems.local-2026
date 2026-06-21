@@ -10,7 +10,11 @@
       </div>
     </div>
 
-    <button class="btn btn-primary">
+    <button
+        type="button"
+        class="btn btn-primary"
+        @click="openCreateModal"
+    >
       Создать
     </button>
   </div>
@@ -64,22 +68,39 @@
 
     </div>
   </div>
+
+  <IncidentCreateModal
+      v-model:open="isCreateModalOpen"
+      @created="reload(state.page)"
+  />
 </template>
 
 <script setup>
 import {Head, router} from '@inertiajs/vue3'
 import {route} from 'ziggy-js';
-import {reactive, watch} from "vue";
+import {reactive, watch, ref} from "vue";
 import IncidentTable from "@/Pages/Incidents/IncidentsTable/IncidentTable.vue";
 import IncidentTablePagination from "@/Pages/Incidents/IncidentsTable/IncidentTablePagination.vue";
 import SearchInToolbar from "@/Pages/Incidents/IncidentsTable/IncidentSearchInToolbar.vue";
 import IncidentPresetFiltersSegmented from "@/Pages/Incidents/IncidentsTable/IncidentPresetFiltersSegmented.vue";
+import IncidentCreateModal from "@/Components/Incidents/FormIncidents/IncidentCreateModal.vue";
 
 const props = defineProps({
   table: {type: Object, required: true},
   filters: {type: Object, required: true},
   options: {type: Object, required: true},
 })
+
+const isCreateModalOpen = ref(false)
+
+/**
+ * Открываем модальное окно создания инцидента.
+ *
+ * Сама загрузка справочников происходит внутри IncidentCreateModal.vue.
+ */
+function openCreateModal() {
+  isCreateModalOpen.value = true
+}
 
 const DEFAULT_PRESET_FILTER = 'unresolved_all'
 

@@ -60,15 +60,14 @@ class ApiSupportObjectInfrastructureSelectController extends Controller
                 // value select = ID объекта инфраструктуры.
                 'id' => $item->id,
                 'value' => $item->id,
-
                 // label select
                 'label' => $item->name,
-
                 // type нужен только для выбора иконки.
                 'type' => $item->type,
-
                 // short_name нужен только для цвета иконки.
                 'short_name' => $item->groupInfrastructureObject?->short_title,
+                //group_infrastructure_object_id для формы инцидентов
+                'group_infrastructure_object_id' => $item->group_infrastructure_object_id ?? null
             ]);
 
         return response()->json([
