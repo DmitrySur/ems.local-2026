@@ -150,13 +150,18 @@ export function useIncidentFormValidation({
     /**
      * Создаем required-правило только если поле реально обязательное.
      */
-    function requiredRule(isRequired, message) {
+    function requiredRule(isRequired, message, trigger = 'change') {
         if (!isRequired) {
             return []
         }
-        return [{
-            required: true, message, trigger: ['change', 'blur'],
-        },]
+
+        return [
+            {
+                required: true,
+                message,
+                trigger,
+            },
+        ]
     }
 
     /**
@@ -218,7 +223,66 @@ export function useIncidentFormValidation({
         activeTab.value = map[field] ?? 'main'
     }
 
+    /**
+     * После изменения поля синхронизируем визуальное состояние Ant Design validation.
+     *
+     * Почему так:
+     * emit('update:modelValue') обновляет props не мгновенно.
+     * Поэтому validateFields нужно запускать после nextTick и после завершения
+     * внутреннего change-цикла Ant Design Vue.
+     */
+    async function syncChangedFieldsValidation(fields) {
+        const fieldNames = Array.isArray(fields)
+            ? fields
+            : [fields]
+
+        await nextTick()
+
+        setTimeout(() => {
+            fieldNames.forEach((field) => {
+                if (!field || !formRef.value) {
+                    return
+                }
+
+                const value = incident.value?.[field]
+
+                /**
+                 * Если поле сейчас не обязательно — просто очищаем ошибку.
+                 */
+                if (!isFieldRequired(field)) {
+                    formRef.value.clearValidate([field])
+                    return
+                }
+
+                /**
+                 * Если поле обязательное, но значение уже есть —
+                 * сразу снимаем ошибку, не ждем blur.
+                 */
+                if (!isEmptyValue(value)) {
+                    formRef.value.clearValidate([field])
+                    return
+                }
+
+                /**
+                 * Если поле обязательное и значение пустое —
+                 * показываем required-ошибку.
+                 */
+                formRef.value.validateFields([field]).catch(() => {})
+            })
+        }, 0)
+    }
+
+    function isFieldRequired(field) {
+        return Boolean(requiredState.value[field])
+    }
+
+    function isEmptyValue(value) {
+        return value === null
+            || value === undefined
+            || value === ''
+    }
+
     return {
-        rules, requiredState, submit, resetValidation,
+        rules, requiredState, submit, resetValidation, syncChangedFieldsValidation
     }
 }

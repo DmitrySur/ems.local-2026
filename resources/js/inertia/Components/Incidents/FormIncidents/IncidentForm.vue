@@ -235,12 +235,12 @@
           <!-- Уточнение по инциденту -->
           <div class="col-md-6">
             <a-form-item
-                label="Уточнение по инциденту"
+                label="Описание инцидента/неисправности"
                 name="detail_incident"
             >
               <a-input
                   :value="modelValue.incident.detail_incident"
-                  placeholder="Уточнение"
+                  placeholder="Описание инцидента/неисправности"
                   :maxlength="450"
                   @input="event => updateIncidentField('detail_incident', event.target.value)"
               />
@@ -823,6 +823,7 @@ const {
   requiredState,
   submit,
   resetValidation,
+  syncChangedFieldsValidation,
 } = useIncidentFormValidation({
   formRef,
   incident,
@@ -862,6 +863,8 @@ function updateIncidentFields(fields) {
       ...fields,
     },
   })
+
+  syncChangedFieldsValidation(Object.keys(fields))
 }
 
 /**
